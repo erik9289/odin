@@ -7,7 +7,7 @@ draw_ui :: proc() {
 	// Display UI elements - num_lives and score in the upper left corner
 	num_lives_text := fmt.ctprint(num_lives)
 	score_text := fmt.ctprint(score)
-	rl.DrawText(num_lives_text, 5, 5, 10, rl.DARKPURPLE)
+	rl.DrawText(num_lives_text, 5, 5, 10, rl.DARKGREEN)
 	rl.DrawText(score_text, 5, 15, 10, rl.WHITE)
 
 	// Display 'Game Over' and Score
