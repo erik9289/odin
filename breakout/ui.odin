@@ -5,10 +5,10 @@ import rl "vendor:raylib"
 
 draw_ui :: proc() {
 	// Display UI elements - num_lives and score in the upper left corner
-	num_lives_text := fmt.ctprint(num_lives)
-	score_text := fmt.ctprint(score)
-	rl.DrawText(num_lives_text, 5, 5, 10, rl.DARKGREEN)
-	rl.DrawText(score_text, 5, 15, 10, rl.WHITE)
+	num_lives_text := fmt.ctprintf("Lives:  %d", num_lives)
+	score_text := fmt.ctprintf("Score: %02d", score)
+	rl.DrawText(num_lives_text, 5, 5, 8, rl.DARKGREEN)
+	rl.DrawText(score_text, 5, 16, 8, rl.WHITE)
 
 	// Display 'Game Over' and Score
 	if game_over {
