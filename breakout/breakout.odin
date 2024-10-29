@@ -35,7 +35,7 @@ restart :: proc(reset: bool) {
 	if reset {
 		for x in 0 ..< NUM_BLOCKS_X {
 			for y in 0 ..< NUM_BLOCKS_Y {
-				blocks[x][y] = true
+				blocks[x][y].visible = true
 			}
 		}
 		num_lives = MAX_LIVES

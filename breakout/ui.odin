@@ -8,7 +8,7 @@ FS_SCORE :: 24
 FS_LIVES :: 8
 FS_HIGHSCORE :: 8
 FS_GAMEOVER :: 24
-FS_RESTART :: 15
+FS_RESTART :: 12
 
 drawUI :: proc() {
 
@@ -39,7 +39,7 @@ drawUI :: proc() {
 		gameOverRestartTextWidth := rl.MeasureText(gameOverRestartText, FS_RESTART)
 		rl.DrawText(
 			gameOverRestartText,
-			centerText(gameOverRestartText, 15, SCREEN_SIZE),
+			centerText(gameOverRestartText, FS_RESTART, SCREEN_SIZE),
 			PADDLE_POS_Y - 30,
 			FS_RESTART,
 			rl.WHITE,

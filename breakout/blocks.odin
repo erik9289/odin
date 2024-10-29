@@ -39,7 +39,11 @@ row_colors := [NUM_BLOCKS_Y]Block_Color {
 	.Yellow,
 }
 
-blocks: [NUM_BLOCKS_X][NUM_BLOCKS_Y]bool
+block :: struct {
+	visible: bool,
+}
+
+blocks: [NUM_BLOCKS_X][NUM_BLOCKS_Y]block
 
 calcBlockRect :: proc(x, y: int) -> rl.Rectangle {
 	return {
@@ -54,7 +58,7 @@ blockExists :: proc(x, y: int) -> bool {
 	if x < 0 || y < 0 || x >= NUM_BLOCKS_X || y >= NUM_BLOCKS_Y {
 		return false
 	}
-	return blocks[x][y]
+	return blocks[x][y].visible
 }
 
 checkBlockCollision :: proc(previous_ball_pos: rl.Vector2) {
@@ -62,7 +66,7 @@ checkBlockCollision :: proc(previous_ball_pos: rl.Vector2) {
 	// Check for collisions with blocks
 	block_x_loop: for x in 0 ..< NUM_BLOCKS_X {
 		for y in 0 ..< NUM_BLOCKS_Y {
-			if blocks[x][y] == false {
+			if !blocks[x][y].visible {
 				continue
 			}
 			block_rect := calcBlockRect(x, y)
@@ -100,7 +104,7 @@ checkBlockCollision :: proc(previous_ball_pos: rl.Vector2) {
 					ball_dir = reflect(ball_dir, collision_normal)
 				}
 				// Now destroy the block!
-				blocks[x][y] = false
+				blocks[x][y].visible = false
 				// Update the score based on block row_colors
 				row_color := row_colors[y]
 				score += block_color_score[row_color]
@@ -118,7 +122,7 @@ checkBlockCollision :: proc(previous_ball_pos: rl.Vector2) {
 drawBlocks :: proc() {
 	for x in 0 ..< NUM_BLOCKS_X {
 		for y in 0 ..< NUM_BLOCKS_Y {
-			if blocks[x][y] == false {
+			if !blocks[x][y].visible {
 				continue // Skip blocks that are hit
 			}
 			block_rect := calcBlockRect(x, y)
