@@ -104,6 +104,9 @@ check_block_collision :: proc(previous_ball_pos: rl.Vector2) {
 				// Update the score based on block row_colors
 				row_color := row_colors[y]
 				score += block_color_score[row_color]
+				if score > highscore {
+					highscore = score
+				}
 
 				break block_x_loop // Breaking outer loop, preventing multiple collsions per frame
 			}

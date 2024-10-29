@@ -3,32 +3,51 @@ package breakout
 import "core:fmt"
 import rl "vendor:raylib"
 
+// Define some constant for fontsizes
+FS_SCORE :: 24
+FS_LIVES :: 8
+FS_HIGHSCORE :: 8
+FS_GAMEOVER :: 24
+FS_RESTART :: 15
+
 draw_ui :: proc() {
+
 	// Display UI elements - num_lives and score in the upper left corner
-	num_lives_text := fmt.ctprintf("Lives:  %d", num_lives)
-	score_text := fmt.ctprintf("Score: %02d", score)
-	rl.DrawText(num_lives_text, 5, 5, 8, rl.DARKGREEN)
-	rl.DrawText(score_text, 5, 16, 8, rl.WHITE)
+	scoreText := fmt.ctprintf("%03d", score)
+	rl.DrawText(scoreText, centerText(scoreText, FS_SCORE, SCREEN_SIZE), 5, FS_SCORE, rl.WHITE)
+
+	numLivesText := fmt.ctprintf("Lives: %d", num_lives)
+	rl.DrawText(numLivesText, 5, 5, FS_LIVES, rl.WHITE)
+
+	// Display highscore in upper right corner
+	highscoreText := fmt.ctprintf("High: %03d", highscore)
+	highscoreTextWidth := rl.MeasureText(highscoreText, FS_HIGHSCORE)
+	rl.DrawText(highscoreText, SCREEN_SIZE - highscoreTextWidth - 5, 5, FS_HIGHSCORE, rl.WHITE)
 
 	// Display 'Game Over' and Score
 	if game_over {
-		game_over_text := fmt.ctprint("Game Over")
-		game_over_text_width := rl.MeasureText(game_over_text, 24)
-		game_over_score_text := fmt.ctprintf("Score: %v  SPACE to restart", score)
-		game_over_score_text_width := rl.MeasureText(game_over_score_text, 15)
+		gameOverText := fmt.ctprint("Game Over")
+		gameOverTextWidth := rl.MeasureText(gameOverText, FS_GAMEOVER)
 		rl.DrawText(
-			game_over_text,
-			SCREEN_SIZE / 2 - game_over_text_width / 2,
+			gameOverText,
+			centerText(gameOverText, FS_GAMEOVER, SCREEN_SIZE),
 			PADDLE_POS_Y - 60,
-			24,
+			FS_GAMEOVER,
 			rl.RED,
 		)
+		gameOverRestartText := fmt.ctprint("SPACE to restart")
+		gameOverRestartTextWidth := rl.MeasureText(gameOverRestartText, FS_RESTART)
 		rl.DrawText(
-			game_over_score_text,
-			SCREEN_SIZE / 2 - game_over_score_text_width / 2,
+			gameOverRestartText,
+			centerText(gameOverRestartText, 15, SCREEN_SIZE),
 			PADDLE_POS_Y - 30,
-			15,
+			FS_RESTART,
 			rl.WHITE,
 		)
 	}
+}
+
+centerText :: proc(text: cstring, fontSize, screenSize: int) -> i32 {
+	textWidth := rl.MeasureText(text, i32(fontSize))
+	return i32(screenSize / 2) - textWidth / 2
 }

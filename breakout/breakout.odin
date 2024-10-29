@@ -22,6 +22,7 @@ ball_dir: rl.Vector2
 started: bool
 game_over: bool
 score: int
+highscore: int
 num_lives := MAX_LIVES
 
 restart :: proc(reset: bool) {

@@ -17,6 +17,9 @@ This will compile and run the breakout code.
   - Add to UI
   - Persist Highscore
   - Add usernames for highscores
+- Levels
+  - After clearing a level, go to a new/next one
+  - Create different shapes of levels
 - Blocks
   - 'hard' blocks that must be hit more than once
   - 'extra life' block
