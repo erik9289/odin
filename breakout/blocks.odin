@@ -41,7 +41,7 @@ row_colors := [NUM_BLOCKS_Y]Block_Color {
 
 blocks: [NUM_BLOCKS_X][NUM_BLOCKS_Y]bool
 
-calc_block_rect :: proc(x, y: int) -> rl.Rectangle {
+calcBlockRect :: proc(x, y: int) -> rl.Rectangle {
 	return {
 		f32(20 + x * BLOCK_WIDTH),
 		f32(40 + y * BLOCK_HEIGHT),
@@ -50,14 +50,14 @@ calc_block_rect :: proc(x, y: int) -> rl.Rectangle {
 	}
 }
 
-block_exists :: proc(x, y: int) -> bool {
+blockExists :: proc(x, y: int) -> bool {
 	if x < 0 || y < 0 || x >= NUM_BLOCKS_X || y >= NUM_BLOCKS_Y {
 		return false
 	}
 	return blocks[x][y]
 }
 
-check_block_collision :: proc(previous_ball_pos: rl.Vector2) {
+checkBlockCollision :: proc(previous_ball_pos: rl.Vector2) {
 
 	// Check for collisions with blocks
 	block_x_loop: for x in 0 ..< NUM_BLOCKS_X {
@@ -65,7 +65,7 @@ check_block_collision :: proc(previous_ball_pos: rl.Vector2) {
 			if blocks[x][y] == false {
 				continue
 			}
-			block_rect := calc_block_rect(x, y)
+			block_rect := calcBlockRect(x, y)
 			if rl.CheckCollisionCircleRec(ball_pos, BALL_RADIUS, block_rect) {
 				collision_normal: rl.Vector2
 				// Ball is above block
@@ -87,11 +87,11 @@ check_block_collision :: proc(previous_ball_pos: rl.Vector2) {
 
 				// Check if there where blocks left or right of current blocks by checking
 				// the collsion_normal. This prevents 'horizontal' reflections when hitting a corner
-				if block_exists(x + int(collision_normal.x), y) {
+				if blockExists(x + int(collision_normal.x), y) {
 					collision_normal.x = 0
 				}
 				// Also for above and beneath
-				if block_exists(x, y + int(collision_normal.y)) {
+				if blockExists(x, y + int(collision_normal.y)) {
 					collision_normal.y = 0
 				}
 
@@ -115,13 +115,13 @@ check_block_collision :: proc(previous_ball_pos: rl.Vector2) {
 
 }
 
-draw_blocks :: proc() {
+drawBlocks :: proc() {
 	for x in 0 ..< NUM_BLOCKS_X {
 		for y in 0 ..< NUM_BLOCKS_Y {
 			if blocks[x][y] == false {
 				continue // Skip blocks that are hit
 			}
-			block_rect := calc_block_rect(x, y)
+			block_rect := calcBlockRect(x, y)
 
 			rl.DrawRectangleRec(block_rect, block_color_values[row_colors[y]])
 			top_left := rl.Vector2{block_rect.x, block_rect.y}

@@ -152,7 +152,7 @@ main :: proc() {
 		}
 
 		// Check for collision with a block
-		check_block_collision(previous_ball_pos)
+		checkBlockCollision(previous_ball_pos)
 
 
 		// Draw
@@ -167,8 +167,8 @@ main :: proc() {
 
 		rl.DrawRectangleRec(paddle_rect, {50, 150, 90, 255}) // draw the paddle
 		rl.DrawCircleV(ball_pos, BALL_RADIUS, {200, 90, 20, 255}) // draw the ball
-		draw_blocks()
-		draw_ui()
+		drawBlocks()
+		drawUI()
 
 		rl.EndMode2D()
 		rl.EndDrawing()

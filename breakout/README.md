@@ -22,5 +22,8 @@ This will compile and run the breakout code.
   - Create different shapes of levels
 - Blocks
   - 'hard' blocks that must be hit more than once
-  - 'extra life' block
+  - blocks that drop a special token, when hit with the paddle it will be enabled:
+    - 'extra life' block
+    - 'multiple balls' block
+    - 'extended paddle' block
 - Controller support
