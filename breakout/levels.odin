@@ -2,6 +2,8 @@ package breakout
 
 import "core:fmt"
 
+NUM_LEVELS :: 2
+
 Level :: [NUM_BLOCKS_X][NUM_BLOCKS_Y]Block
 Level_Cfg :: [NUM_BLOCKS_Y][NUM_BLOCKS_X * 3]u8
 levels: [NUM_LEVELS]^Level

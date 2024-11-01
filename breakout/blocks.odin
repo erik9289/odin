@@ -7,7 +7,13 @@ NUM_BLOCKS_X :: 10
 NUM_BLOCKS_Y :: 8
 BLOCK_WIDTH :: 28
 BLOCK_HEIGHT :: 10
-NUM_LEVELS :: 2
+
+
+Block :: struct {
+	color:   Block_Color,
+	shields: int,
+	visible: bool,
+}
 
 Block_Color :: enum {
 	Yellow,
@@ -30,24 +36,6 @@ block_color_score := [Block_Color]int {
 	.Red    = 8,
 }
 
-row_colors := [NUM_BLOCKS_Y]Block_Color {
-	.Red,
-	.Red,
-	.Orange,
-	.Orange,
-	.Green,
-	.Green,
-	.Yellow,
-	.Yellow,
-}
-
-Block :: struct {
-	color:   Block_Color,
-	shields: int,
-	visible: bool,
-}
-
-
 calc_block_rect :: proc(x, y: int) -> rl.Rectangle {
 	return {
 		f32(20 + x * BLOCK_WIDTH),
@@ -64,9 +52,8 @@ block_exists :: proc(x, y: int) -> bool {
 	return levels[level_current][x][y].visible
 }
 
+// Check for collisions with blocks
 check_block_collision :: proc(previous_ball_pos: rl.Vector2) {
-
-	// Check for collisions with blocks
 	block_x_loop: for x in 0 ..< NUM_BLOCKS_X {
 		for y in 0 ..< NUM_BLOCKS_Y {
 			if !levels[level_current][x][y].visible {
@@ -114,8 +101,8 @@ check_block_collision :: proc(previous_ball_pos: rl.Vector2) {
 				}
 
 				// Update the score based on block row_colors
-				row_color := row_colors[y]
-				score += block_color_score[row_color]
+				block_color := levels[level_current][x][y].color
+				score += block_color_score[block_color]
 				if score > highscore {
 					highscore = score
 				}

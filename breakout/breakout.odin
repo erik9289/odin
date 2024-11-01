@@ -42,7 +42,6 @@ restart :: proc(reset: bool) {
 		// 		levels[level_current][x][y].visible = true
 		// 	}
 		// }
-
 		num_lives = MAX_LIVES
 		score = 0
 		game_over = false
@@ -94,7 +93,8 @@ main :: proc() {
 
 	rl.SetTargetFPS(160)
 
-	hit_paddle_snd := rl.LoadSound("assets/sound4.wav")
+	hit_paddle_snd := rl.LoadSound("assets/paddle_hit.wav")
+	game_over_snd := rl.LoadSound("assets/game_over.wav")
 
 	init_levels()
 	defer free_levels()
@@ -121,7 +121,6 @@ main :: proc() {
 			}
 		} else if game_over {
 			restart(true)
-			// started = true
 			if rl.IsKeyPressed(.SPACE) {
 				// restart(true)
 				started = true
@@ -152,6 +151,7 @@ main :: proc() {
 		if ball_pos.y + BALL_RADIUS * 6 > SCREEN_SIZE {
 			num_lives -= 1
 			if num_lives == 0 {
+				rl.PlaySound(game_over_snd)
 				game_over = true
 			}
 			restart(false)
