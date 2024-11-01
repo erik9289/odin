@@ -3,6 +3,7 @@ package breakout
 import "core:fmt"
 import "core:math"
 import "core:math/linalg"
+import "core:mem"
 import rl "vendor:raylib"
 
 SCREEN_SIZE :: 320
@@ -25,22 +26,31 @@ score: int
 highscore: int
 num_lives := MAX_LIVES
 
+level_current: int
+level_cnt: int
+
 restart :: proc(reset: bool) {
 	paddle_pos_x = SCREEN_SIZE / 2 - PADDLE_WIDTH / 2
 	ball_pos = {SCREEN_SIZE / 2, BALL_START_Y}
 	started = false
 
 	// Reset the blocks if no lives left or at the start
-	// if game_over || num_lives == MAX_LIVES {
 	if reset {
-		for x in 0 ..< NUM_BLOCKS_X {
-			for y in 0 ..< NUM_BLOCKS_Y {
-				blocks[x][y].visible = true
-			}
-		}
+		// TODO: Check if we need to do this (here)
+		// for x in 0 ..< NUM_BLOCKS_X {
+		// 	for y in 0 ..< NUM_BLOCKS_Y {
+		// 		levels[level_current][x][y].visible = true
+		// 	}
+		// }
+
 		num_lives = MAX_LIVES
 		score = 0
 		game_over = false
+		level_current = 0
+		level_cnt = 0
+
+		free_levels()
+		init_levels()
 	}
 }
 
@@ -51,9 +61,43 @@ reflect :: proc(dir, normal: rl.Vector2) -> rl.Vector2 {
 
 
 main :: proc() {
+	// Debug
+	when ODIN_DEBUG {
+		track: mem.Tracking_Allocator
+		mem.tracking_allocator_init(&track, context.allocator)
+		context.allocator = mem.tracking_allocator(&track)
+
+		defer {
+			if len(track.allocation_map) > 0 {
+				fmt.eprintf("=== %v allocations not freed: ===\n", len(track.allocation_map))
+				for _, entry in track.allocation_map {
+					fmt.eprintf("- %v bytes @ %v\n", entry.size, entry.location)
+				}
+			}
+			if len(track.bad_free_array) > 0 {
+				fmt.eprintf("=== %v incorrect frees: ===\n", len(track.bad_free_array))
+				for entry in track.bad_free_array {
+					fmt.eprintf("- %p @ %v\n", entry.memory, entry.location)
+				}
+			}
+			mem.tracking_allocator_destroy(&track)
+			fmt.println("End of debug defer call")
+		}
+	}
+
 	rl.SetConfigFlags({.VSYNC_HINT})
 	rl.InitWindow(640, 640, "Breakout!")
-	rl.SetTargetFPS(500)
+	defer rl.CloseWindow()
+
+	rl.InitAudioDevice()
+	defer rl.CloseAudioDevice()
+
+	rl.SetTargetFPS(160)
+
+	hit_paddle_snd := rl.LoadSound("assets/sound4.wav")
+
+	init_levels()
+	defer free_levels()
 
 	restart(true)
 
@@ -149,10 +193,11 @@ main :: proc() {
 			if collision_normal != 0 {
 				ball_dir = reflect(ball_dir, collision_normal)
 			}
+			rl.PlaySound(hit_paddle_snd)
 		}
 
 		// Check for collision with a block
-		checkBlockCollision(previous_ball_pos)
+		check_block_collision(previous_ball_pos)
 
 
 		// Draw
@@ -167,13 +212,12 @@ main :: proc() {
 
 		rl.DrawRectangleRec(paddle_rect, {50, 150, 90, 255}) // draw the paddle
 		rl.DrawCircleV(ball_pos, BALL_RADIUS, {200, 90, 20, 255}) // draw the ball
-		drawBlocks()
-		drawUI()
+		draw_blocks()
+		draw_ui()
 
 		rl.EndMode2D()
 		rl.EndDrawing()
 
 		free_all(context.temp_allocator)
 	}
-	rl.CloseWindow()
 }

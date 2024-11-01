@@ -10,7 +10,7 @@ FS_HIGHSCORE :: 8
 FS_GAMEOVER :: 24
 FS_RESTART :: 12
 
-drawUI :: proc() {
+draw_ui :: proc() {
 
 	// Display UI elements - num_lives and score in the upper left corner
 	scoreText := fmt.ctprintf("%03d", score)
