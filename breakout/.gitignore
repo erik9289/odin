@@ -1,3 +1,6 @@
 # Binary
 breakout
 breakout.exe
+
+# Debug
+breakout.dSYM/
