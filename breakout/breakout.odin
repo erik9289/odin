@@ -29,6 +29,10 @@ num_lives := MAX_LIVES
 level_current: int
 level_cnt: int
 
+game_over_snd: rl.Sound
+hit_paddle_snd: rl.Sound
+hit_block_snd: rl.Sound
+
 restart :: proc(reset: bool) {
 	paddle_pos_x = SCREEN_SIZE / 2 - PADDLE_WIDTH / 2
 	ball_pos = {SCREEN_SIZE / 2, BALL_START_Y}
@@ -90,11 +94,12 @@ main :: proc() {
 
 	rl.InitAudioDevice()
 	defer rl.CloseAudioDevice()
+	hit_paddle_snd = rl.LoadSound("assets/paddle_hit.wav")
+	game_over_snd = rl.LoadSound("assets/game_over.wav")
+	hit_block_snd = rl.LoadSound("assets/hit_block.wav")
 
 	rl.SetTargetFPS(160)
 
-	hit_paddle_snd := rl.LoadSound("assets/paddle_hit.wav")
-	game_over_snd := rl.LoadSound("assets/game_over.wav")
 
 	init_levels()
 	defer free_levels()
