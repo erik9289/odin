@@ -94,7 +94,7 @@ main :: proc() {
 
 	rl.InitAudioDevice()
 	defer rl.CloseAudioDevice()
-	hit_paddle_snd = rl.LoadSound("assets/paddle_hit.wav")
+	hit_paddle_snd = rl.LoadSound("assets/hit_paddle.wav")
 	game_over_snd = rl.LoadSound("assets/game_over.wav")
 	hit_block_snd = rl.LoadSound("assets/hit_block.wav")
 

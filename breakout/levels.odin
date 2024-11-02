@@ -7,7 +7,7 @@ NUM_LEVELS :: 2
 Level :: [NUM_BLOCKS_X][NUM_BLOCKS_Y]Block
 Level_Cfg :: [NUM_BLOCKS_Y][NUM_BLOCKS_X * 3]u8
 levels: [NUM_LEVELS]^Level
-level_cfgs := [NUM_LEVELS]Level_Cfg{test1_cfg, test2_cfg}
+level_cfgs := [NUM_LEVELS]Level_Cfg{level1_cfg, level2_cfg}
 
 configure_level :: proc(lvl_cfg: Level_Cfg) -> ^Level {
 	lvl := new(Level)
