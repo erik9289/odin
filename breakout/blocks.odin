@@ -1,11 +1,19 @@
 package breakout
 
+import "core:fmt"
 import rl "vendor:raylib"
 
 NUM_BLOCKS_X :: 10
 NUM_BLOCKS_Y :: 8
 BLOCK_WIDTH :: 28
 BLOCK_HEIGHT :: 10
+
+
+Block :: struct {
+	color:   Block_Color,
+	shields: int,
+	visible: bool,
+}
 
 Block_Color :: enum {
 	Yellow,
@@ -28,20 +36,7 @@ block_color_score := [Block_Color]int {
 	.Red    = 8,
 }
 
-row_colors := [NUM_BLOCKS_Y]Block_Color {
-	.Red,
-	.Red,
-	.Orange,
-	.Orange,
-	.Green,
-	.Green,
-	.Yellow,
-	.Yellow,
-}
-
-blocks: [NUM_BLOCKS_X][NUM_BLOCKS_Y]bool
-
-calcBlockRect :: proc(x, y: int) -> rl.Rectangle {
+calc_block_rect :: proc(x, y: int) -> rl.Rectangle {
 	return {
 		f32(20 + x * BLOCK_WIDTH),
 		f32(40 + y * BLOCK_HEIGHT),
@@ -50,22 +45,21 @@ calcBlockRect :: proc(x, y: int) -> rl.Rectangle {
 	}
 }
 
-blockExists :: proc(x, y: int) -> bool {
+block_exists :: proc(x, y: int) -> bool {
 	if x < 0 || y < 0 || x >= NUM_BLOCKS_X || y >= NUM_BLOCKS_Y {
 		return false
 	}
-	return blocks[x][y]
+	return levels[level_current][x][y].visible
 }
 
-checkBlockCollision :: proc(previous_ball_pos: rl.Vector2) {
-
-	// Check for collisions with blocks
+// Check for collisions with blocks
+check_block_collision :: proc(previous_ball_pos: rl.Vector2) {
 	block_x_loop: for x in 0 ..< NUM_BLOCKS_X {
 		for y in 0 ..< NUM_BLOCKS_Y {
-			if blocks[x][y] == false {
+			if !levels[level_current][x][y].visible {
 				continue
 			}
-			block_rect := calcBlockRect(x, y)
+			block_rect := calc_block_rect(x, y)
 			if rl.CheckCollisionCircleRec(ball_pos, BALL_RADIUS, block_rect) {
 				collision_normal: rl.Vector2
 				// Ball is above block
@@ -87,11 +81,11 @@ checkBlockCollision :: proc(previous_ball_pos: rl.Vector2) {
 
 				// Check if there where blocks left or right of current blocks by checking
 				// the collsion_normal. This prevents 'horizontal' reflections when hitting a corner
-				if blockExists(x + int(collision_normal.x), y) {
+				if block_exists(x + int(collision_normal.x), y) {
 					collision_normal.x = 0
 				}
 				// Also for above and beneath
-				if blockExists(x, y + int(collision_normal.y)) {
+				if block_exists(x, y + int(collision_normal.y)) {
 					collision_normal.y = 0
 				}
 
@@ -99,15 +93,39 @@ checkBlockCollision :: proc(previous_ball_pos: rl.Vector2) {
 				if collision_normal != 0 {
 					ball_dir = reflect(ball_dir, collision_normal)
 				}
-				// Now destroy the block!
-				blocks[x][y] = false
+
+				// Now lower the shield or destroy the block!
+				rl.SetSoundPitch(hit_block_snd, rl.Vector2Length(collision_normal) * 0.8)
+				rl.PlaySound(hit_block_snd)
+				levels[level_current][x][y].shields -= 1
+				if levels[level_current][x][y].shields < 1 {
+					levels[level_current][x][y].visible = false
+				}
+
 				// Update the score based on block row_colors
-				row_color := row_colors[y]
-				score += block_color_score[row_color]
+				block_color := levels[level_current][x][y].color
+				score += block_color_score[block_color]
 				if score > highscore {
 					highscore = score
 				}
 
+				// Check if all blocks have been cleared, then go to next Level
+				if is_level_cleared(level_current) {
+					fmt.printf("* cleared level! level_current = %d\n", level_current)
+					level_current = (level_current + 1) % NUM_LEVELS
+					if level_current == 0 {
+						// We cycled throug all available levels, reset the levels before we continue
+						free_levels()
+						init_levels()
+					}
+					level_cnt += 1
+					fmt.printf(
+						"updated level_current: level_current = %d, level_cnt=%d, NUM_LEVELS=%d\n",
+						level_current,
+						level_cnt,
+						NUM_LEVELS,
+					)
+				}
 				break block_x_loop // Breaking outer loop, preventing multiple collsions per frame
 			}
 		}
@@ -115,15 +133,16 @@ checkBlockCollision :: proc(previous_ball_pos: rl.Vector2) {
 
 }
 
-drawBlocks :: proc() {
+draw_blocks :: proc() {
 	for x in 0 ..< NUM_BLOCKS_X {
 		for y in 0 ..< NUM_BLOCKS_Y {
-			if blocks[x][y] == false {
+			if !levels[level_current][x][y].visible {
 				continue // Skip blocks that are hit
 			}
-			block_rect := calcBlockRect(x, y)
+			block_rect := calc_block_rect(x, y)
 
-			rl.DrawRectangleRec(block_rect, block_color_values[row_colors[y]])
+			// rl.DrawRectangleRec(block_rect, block_color_values[row_colors[y]])
+			rl.DrawRectangleRec(block_rect, block_color_values[levels[level_current][x][y].color])
 			top_left := rl.Vector2{block_rect.x, block_rect.y}
 			top_right := rl.Vector2{block_rect.x + block_rect.width, block_rect.y}
 			bottom_left := rl.Vector2{block_rect.x, block_rect.y + block_rect.height}
