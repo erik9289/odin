@@ -32,6 +32,8 @@ level_cnt: int
 game_over_snd: rl.Sound
 hit_paddle_snd: rl.Sound
 hit_block_snd: rl.Sound
+lives_img: rl.Texture
+lives_img_16: rl.Texture
 
 restart :: proc(reset: bool) {
 	paddle_pos_x = SCREEN_SIZE / 2 - PADDLE_WIDTH / 2
@@ -97,6 +99,9 @@ main :: proc() {
 	hit_paddle_snd = rl.LoadSound("assets/hit_paddle.wav")
 	game_over_snd = rl.LoadSound("assets/game_over.wav")
 	hit_block_snd = rl.LoadSound("assets/hit_block.wav")
+
+	lives_img = rl.LoadTexture("assets/heart_32.png")
+	lives_img_16 = rl.LoadTexture("assets/heart_16.png")
 
 	rl.SetTargetFPS(160)
 

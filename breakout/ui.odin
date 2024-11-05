@@ -5,26 +5,31 @@ import rl "vendor:raylib"
 
 // Define some constant for fontsizes
 FS_SCORE :: 24
-FS_LIVES :: 8
 FS_HIGHSCORE :: 8
 FS_GAMEOVER :: 24
 FS_RESTART :: 12
 
+/*
+    Draw UI components like:
+    - the score, high score and number of lives left
+    - 'Game Over' notification
+*/
 draw_ui :: proc() {
+	// Display num_lives (as heart icons) in the upper left corner
+	for i in 0 ..< num_lives {
+		rl.DrawTextureEx(lives_img, {f32(5 + (i * 14)), 5}, 0, 0.4, rl.WHITE)
+	}
 
-	// Display UI elements - num_lives and score in the upper left corner
+	// Display the score in the center of the screen
 	score_text := fmt.ctprintf("%03d", score)
 	rl.DrawText(score_text, center_text(score_text, FS_SCORE, SCREEN_SIZE), 5, FS_SCORE, rl.WHITE)
-
-	num_lives_text := fmt.ctprintf("Lives: %d", num_lives)
-	rl.DrawText(num_lives_text, 5, 5, FS_LIVES, rl.WHITE)
 
 	// Display highscore in upper right corner
 	highscore_text := fmt.ctprintf("High: %03d", highscore)
 	highscore_text_width := rl.MeasureText(highscore_text, FS_HIGHSCORE)
 	rl.DrawText(highscore_text, SCREEN_SIZE - highscore_text_width - 5, 5, FS_HIGHSCORE, rl.WHITE)
 
-	// Display 'Game Over' and Score
+	// Display 'Game Over'
 	if game_over {
 		game_over_text := fmt.ctprint("Game Over")
 		rl.DrawText(

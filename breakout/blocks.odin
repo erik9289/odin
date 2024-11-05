@@ -95,8 +95,8 @@ check_block_collision :: proc(previous_ball_pos: rl.Vector2) {
 				}
 
 				// Now lower the shield or destroy the block!
-				// rl.SetSoundPitch(hit_block_snd, rl.Vector2Length(collision_normal) * 0.8)
-				// rl.PlaySound(hit_block_snd)
+				rl.SetSoundPitch(hit_block_snd, rl.Vector2Length(collision_normal) * 0.8)
+				rl.PlaySound(hit_block_snd)
 				levels[level_current][x][y].shields -= 1
 				if levels[level_current][x][y].shields < 1 {
 					levels[level_current][x][y].visible = false
