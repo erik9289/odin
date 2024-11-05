@@ -2,6 +2,8 @@
 
 This is a classic `Breakout` game implementation, adapted from the excellent Youtube video: [Odin + Raylib: Breakout game from start to finish](https://www.youtube.com/watch?v=vfgZOEvO0kM)  by Karl Zylinski.
 
+![Breakout!](./Screenshot.png)
+
 ## Compile and run the game
 - [Install the Odin compiler](https://odin-lang.org/docs/install/) (I just ran `brew install odin` on my Mac)
 - Enter the `breakout` folder and run:
