@@ -1,2 +1,9 @@
 # Binary
 breakout
+breakout.exe
+
+# Debug
+breakout.dSYM/
+
+# assets
+assets/.DS_Store

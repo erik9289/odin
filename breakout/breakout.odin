@@ -3,6 +3,7 @@ package breakout
 import "core:fmt"
 import "core:math"
 import "core:math/linalg"
+import "core:mem"
 import rl "vendor:raylib"
 
 SCREEN_SIZE :: 320
@@ -22,7 +23,16 @@ ball_dir: rl.Vector2
 started: bool
 game_over: bool
 score: int
+highscore: int
 num_lives := MAX_LIVES
+
+level_current: int
+level_cnt: int
+
+game_over_snd: rl.Sound
+hit_paddle_snd: rl.Sound
+hit_block_snd: rl.Sound
+lives_img: rl.Texture
 
 restart :: proc(reset: bool) {
 	paddle_pos_x = SCREEN_SIZE / 2 - PADDLE_WIDTH / 2
@@ -30,16 +40,21 @@ restart :: proc(reset: bool) {
 	started = false
 
 	// Reset the blocks if no lives left or at the start
-	// if game_over || num_lives == MAX_LIVES {
 	if reset {
-		for x in 0 ..< NUM_BLOCKS_X {
-			for y in 0 ..< NUM_BLOCKS_Y {
-				blocks[x][y] = true
-			}
-		}
+		// TODO: Check if we need to do this (here)
+		// for x in 0 ..< NUM_BLOCKS_X {
+		// 	for y in 0 ..< NUM_BLOCKS_Y {
+		// 		levels[level_current][x][y].visible = true
+		// 	}
+		// }
 		num_lives = MAX_LIVES
 		score = 0
 		game_over = false
+		level_current = 0
+		level_cnt = 0
+
+		free_levels()
+		init_levels()
 	}
 }
 
@@ -50,9 +65,47 @@ reflect :: proc(dir, normal: rl.Vector2) -> rl.Vector2 {
 
 
 main :: proc() {
+	// Debug
+	when ODIN_DEBUG {
+		track: mem.Tracking_Allocator
+		mem.tracking_allocator_init(&track, context.allocator)
+		context.allocator = mem.tracking_allocator(&track)
+
+		defer {
+			if len(track.allocation_map) > 0 {
+				fmt.eprintf("=== %v allocations not freed: ===\n", len(track.allocation_map))
+				for _, entry in track.allocation_map {
+					fmt.eprintf("- %v bytes @ %v\n", entry.size, entry.location)
+				}
+			}
+			if len(track.bad_free_array) > 0 {
+				fmt.eprintf("=== %v incorrect frees: ===\n", len(track.bad_free_array))
+				for entry in track.bad_free_array {
+					fmt.eprintf("- %p @ %v\n", entry.memory, entry.location)
+				}
+			}
+			mem.tracking_allocator_destroy(&track)
+			fmt.println("End of debug defer call")
+		}
+	}
+
 	rl.SetConfigFlags({.VSYNC_HINT})
 	rl.InitWindow(640, 640, "Breakout!")
-	rl.SetTargetFPS(500)
+	defer rl.CloseWindow()
+
+	rl.InitAudioDevice()
+	defer rl.CloseAudioDevice()
+	hit_paddle_snd = rl.LoadSound("assets/hit_paddle.wav")
+	game_over_snd = rl.LoadSound("assets/game_over.wav")
+	hit_block_snd = rl.LoadSound("assets/hit_block.wav")
+
+	lives_img = rl.LoadTexture("assets/heart_32.png")
+
+	rl.SetTargetFPS(160)
+
+
+	init_levels()
+	defer free_levels()
 
 	restart(true)
 
@@ -76,7 +129,6 @@ main :: proc() {
 			}
 		} else if game_over {
 			restart(true)
-			// started = true
 			if rl.IsKeyPressed(.SPACE) {
 				// restart(true)
 				started = true
@@ -107,6 +159,7 @@ main :: proc() {
 		if ball_pos.y + BALL_RADIUS * 6 > SCREEN_SIZE {
 			num_lives -= 1
 			if num_lives == 0 {
+				rl.PlaySound(game_over_snd)
 				game_over = true
 			}
 			restart(false)
@@ -148,6 +201,7 @@ main :: proc() {
 			if collision_normal != 0 {
 				ball_dir = reflect(ball_dir, collision_normal)
 			}
+			rl.PlaySound(hit_paddle_snd)
 		}
 
 		// Check for collision with a block
@@ -174,5 +228,4 @@ main :: proc() {
 
 		free_all(context.temp_allocator)
 	}
-	rl.CloseWindow()
 }
